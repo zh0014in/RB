@@ -14,7 +14,7 @@ using namespace std;
 unsigned long TOTAL_SHA = 0; // Count the number of hashes performed.
 
 unsigned char M[1024 * 512][3]; // array to store the word read from the table (head of chain)
-unsigned int D[1024 * 512][5];  // array to store the digest read from the table  (end of chain)
+unsigned char D[1024 * 512][3]; // array to store the digest read from the table  (end of chain)
 
 //-------   Data Structure for searching    -----------//
 unordered_map<unsigned int, unsigned int> HashTable;
@@ -71,6 +71,19 @@ int ReadT()
   fclose(pFile);
   return (0);
 }
+int destWordExists(unsigned char d[3], int n_chain)
+{
+  unsigned char *pD;
+  for (int i = 0; i < n_chain; i++)
+  {
+    pD = D[i];
+    if (*pD == d[0] && *(pD + 1) == d[1] && *(pD + 2) == d[2])
+    {
+      return i;
+    }
+  }
+  return -1;
+}
 
 //------------------------------------------------------------------------------------
 //      Given a digest,  search for the pre-image   answer_m[3].
@@ -83,7 +96,11 @@ int search(unsigned int target_d[5], unsigned char answer_m[3])
   unsigned char Colour_m[3];
   unsigned int Colour_d[5];
   unsigned int flag[MAX_LEN];
-
+  Colour_d[0] = target_d[0];
+  Colour_d[1] = target_d[1];
+  Colour_d[2] = target_d[2];
+  Colour_d[3] = target_d[3];
+  Colour_d[4] = target_d[4];
   // for (j = 0; j < L_CHAIN; j++)
   // {
   //   Colour_d[j][0] = target_d[0];
@@ -97,7 +114,22 @@ int search(unsigned int target_d[5], unsigned char answer_m[3])
   {
     Reduce(Colour_d, Colour_m, j);
     // check if Colour_m is in the data structure;
-
+    if (int index = destWordExists(Colour_m, MAX_LEN) >= 0)
+    {
+      Colour_m[0] = M[index][0];
+      Colour_m[1] = M[index][1];
+      Colour_m[2] = M[index][2];
+      for (i = 0; i < j; i++)
+      {
+        Hash(Colour_m, Colour_d);
+        Reduce(Colour_d, Colour_m, i);
+      }
+      // Colour_m is now the pre-image
+      answer_m[0] = Colour_m[0];
+      answer_m[1] = Colour_m[1];
+      answer_m[2] = Colour_m[2];
+      return 1;
+    }
     Hash(Colour_m, Colour_d);
 
     //-------- search for the digest Colour_d[k] in the data structure.
@@ -131,7 +163,7 @@ int main(int argc, char *argv[])
 
   //------------ R E A D     R A I N B O W    T A B L E  --------//
   ReadT();
-  cout << "READ DONE" << endl;
+  cout << "READ RAINBOW DONE" << endl;
 
   //--------  PROJECT  INPUT/OUTPUT FORMAT ----------------//
 
@@ -144,17 +176,16 @@ int main(int argc, char *argv[])
   for (int i = 0; i < 5000; i++)
   {
     readnextd(d);
-    if (search(d, m))
+    if (search(d, m) > 0)
     {
-      unsigned char m2[3];
       total_found++;
       //------   print the word in hexdecimal format   -----------
-      cout << setw(1) << (unsigned int)m2[0] / 16;
-      cout << setw(1) << (unsigned int)m2[0] % 8;
-      cout << setw(1) << (unsigned int)m2[1] / 16;
-      cout << setw(1) << (unsigned int)m2[1] % 8;
-      cout << setw(1) << (unsigned int)m2[2] / 16;
-      cout << setw(1) << (unsigned int)m2[2] % 8 << endl;
+      cout << setw(1) << (unsigned int)m[0] / 16;
+      cout << setw(1) << (unsigned int)m[0] % 8;
+      cout << setw(1) << (unsigned int)m[1] / 16;
+      cout << setw(1) << (unsigned int)m[1] % 8;
+      cout << setw(1) << (unsigned int)m[2] / 16;
+      cout << setw(1) << (unsigned int)m[2] % 8 << endl;
     }
     else
     {

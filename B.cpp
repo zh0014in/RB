@@ -62,15 +62,16 @@ int Reduce(unsigned int d[5], unsigned char m[3], int i)
 
 int destWordExists(unsigned char d[3], int n_chain)
 {
+  unsigned char *pD;
   for (int i = 0; i < n_chain; i++)
   {
     pD = D[i];
     if (*pD == d[0] && *(pD + 1) == d[1] && *(pD + 2) == d[2])
     {
-      return 1;
+      return i;
     }
   }
-  return 0;
+  return -1;
 }
 
 int buildT(int rounds)
@@ -94,7 +95,7 @@ int buildT(int rounds)
       Hash(m, d);
       Reduce(d, m, j);
     }
-    if (destWordExists(m,N_CHAIN) == 1)
+    if (destWordExists(m,N_CHAIN) >= 0)
     {
       continue;
     }
