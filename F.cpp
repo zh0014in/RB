@@ -173,9 +173,16 @@ int main(int argc, char *argv[])
   cout.setf(ios::hex, ios::basefield); //   setting display to Hexdecimal format.  (this is the irritating part of using C++).
   cout.setf(ios::uppercase);
 
+FILE *pFile = fopen("SAMPLE_INPUT.data","rb");
+if(pFIle == NULL){
+  cout << "cannot open file." << endl;
+  exit(0);
+}
+
   for (int i = 0; i < 5000; i++)
   {
-    readnextd(d);
+    fread(&d, 20, 1, pFile);
+    //readnextd(d);
     if (search(d, m) > 0)
     {
       total_found++;
