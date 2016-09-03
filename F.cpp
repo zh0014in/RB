@@ -6,6 +6,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
 #include "sha1.h"
 
 using namespace std;
@@ -48,6 +50,22 @@ int Reduce(unsigned int d[5], unsigned char m[3], int i)
   return (0);
 }
 
+struct HexCharStruct
+{
+  unsigned char c;
+  HexCharStruct(unsigned char _c) : c(_c) { }
+};
+
+inline std::ostream& operator<<(std::ostream& o, const HexCharStruct& hs)
+{
+  return (o << std::hex << (int)hs.c);
+}
+
+inline HexCharStruct hex(unsigned char _c)
+{
+  return HexCharStruct(_c);
+}
+
 //------------  Read in the Table ------------------//
 //   Store the result in M and D                    //
 int ReadT()
@@ -66,6 +84,7 @@ int ReadT()
   {
     fread(&M[i], 3, 1, pFile);
     fread(&D[i], 3, 1, pFile);
+    //cout << hex(M[i][0]) << (int)M[i][1] << (int)M[i][2] << "  " << (int)D[i][0] << (int)D[i][1] << (int)D[i][2] << endl;
   }
 
   fclose(pFile);
@@ -101,6 +120,7 @@ int search(unsigned int target_d[5], unsigned char answer_m[3])
   Colour_d[2] = target_d[2];
   Colour_d[3] = target_d[3];
   Colour_d[4] = target_d[4];
+  //cout << Colour_d[0] << Colour_d[1] << Colour_d[2] << endl;
   // for (j = 0; j < L_CHAIN; j++)
   // {
   //   Colour_d[j][0] = target_d[0];
@@ -116,6 +136,7 @@ int search(unsigned int target_d[5], unsigned char answer_m[3])
     // check if Colour_m is in the data structure;
     if (int index = destWordExists(Colour_m, MAX_LEN) >= 0)
     {
+      cout << "word found" << endl;
       Colour_m[0] = M[index][0];
       Colour_m[1] = M[index][1];
       Colour_m[2] = M[index][2];
@@ -173,15 +194,30 @@ int main(int argc, char *argv[])
   cout.setf(ios::hex, ios::basefield); //   setting display to Hexdecimal format.  (this is the irritating part of using C++).
   cout.setf(ios::uppercase);
 
-FILE *pFile = fopen("SAMPLE_INPUT.data","rb");
-if(pFIle == NULL){
-  cout << "cannot open file." << endl;
-  exit(0);
-}
+  string line;
+  ifstream myFile;
+  myFile.open("SAMPLE_INPUT.data.txt");
+  if (!myFile.is_open())
+  {
+    cout << "unable to open file" << endl;
+    exit(0);
+  }
 
   for (int i = 0; i < 5000; i++)
   {
-    fread(&d, 20, 1, pFile);
+    getline(myFile, line);
+    istringstream iss(line);
+    int j = 0;
+    do
+    {
+      string sub;
+      iss >> sub;
+      std::stringstream ss;
+      ss << std::hex << sub;
+      ss >> d[j];
+      j++;
+    } while (iss);
+    //cout << d[0] << d[1] << d[2] << d[3] << d[4] << endl;
     //readnextd(d);
     if (search(d, m) > 0)
     {
@@ -197,10 +233,10 @@ if(pFIle == NULL){
     else
     {
       total_not_found++;
-      cout << setw(6) << 0 << endl;
+      //cout << setw(6) << 0 << endl;
     }
   }
-
+  myFile.close();
   cout.setf(ios::dec);
   cout << "Accuracy       C is: " << total_found / 5000.0 << endl;
   cout << "Speedup factor F is: " << (5000.0 / TOTAL_SHA) * 8388608 << endl;

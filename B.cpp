@@ -12,7 +12,7 @@ using namespace std;
 //  A table to store all the words and digests.
 //    infeasible to have such large table in practice.
 //    for programming convenient, we store the whole table in memory.
-#define HT 100 // 1048576
+#define HT 10000 // 1048576
 unsigned char Word[HT][3];
 unsigned char M[HT][3];
 unsigned char D[HT][3];
@@ -116,13 +116,13 @@ int buildT(int rounds)
   FILE *pFile = fopen("table.data", "wb");
   for (long i = 0; i < N_CHAIN; i++)
   {
-    fwrite(&(M[i][0]), sizeof(unsigned char), 1, pFile);
-    fwrite(&(M[i][1]), sizeof(unsigned char), 1, pFile);
     fwrite(&(M[i][2]), sizeof(unsigned char), 1, pFile);
+    fwrite(&(M[i][1]), sizeof(unsigned char), 1, pFile);
+    fwrite(&(M[i][0]), sizeof(unsigned char), 1, pFile);
 
-    fwrite(&(D[i][0]), sizeof(unsigned char), 1, pFile);
-    fwrite(&(D[i][1]), sizeof(unsigned char), 1, pFile);
     fwrite(&(D[i][2]), sizeof(unsigned char), 1, pFile);
+    fwrite(&(D[i][1]), sizeof(unsigned char), 1, pFile);
+    fwrite(&(D[i][0]), sizeof(unsigned char), 1, pFile);
   }
   return (0);
 }
