@@ -78,32 +78,31 @@ int ReadT()
 int search(unsigned int target_d[5], unsigned char answer_m[3])
 {
   int j, i;
-  unsigned char Colour_m[MAX_LEN][3];
-  unsigned int Colour_d[MAX_LEN][5];
+  //unsigned char Colour_m[MAX_LEN][3];
+  //unsigned int Colour_d[MAX_LEN][5];
+  unsigned char Colour_m[3];
+  unsigned int Colour_d[5];
   unsigned int flag[MAX_LEN];
 
-  for (j = 0; j < L_CHAIN; j++)
+  // for (j = 0; j < L_CHAIN; j++)
+  // {
+  //   Colour_d[j][0] = target_d[0];
+  //   Colour_d[j][1] = target_d[1];
+  //   Colour_d[j][2] = target_d[2];
+  //   Colour_d[j][3] = target_d[3];
+  //   Colour_d[j][4] = target_d[4];
+  // }
+
+  for (j = L_CHAIN - 1; j >= 0; j--)
   {
-    Colour_d[j][0] = target_d[0];
-    Colour_d[j][1] = target_d[1];
-    Colour_d[j][2] = target_d[2];
-    Colour_d[j][3] = target_d[3];
-    Colour_d[j][4] = target_d[4];
-  }
+    Reduce(Colour_d, Colour_m, j);
+    // check if Colour_m is in the data structure;
 
-  for (j = L_CHAIN-1; j >= 0; j--)
-  {
-    for (int k = 0; k < j + 1; k++)
-    {
-      Reduce(Colour_d[k], Colour_m[k], j);
-      // check if Colour_m is in the data structure;
+    Hash(Colour_m, Colour_d);
 
-      Hash(Colour_m[k], Colour_d[k]);
+    //-------- search for the digest Colour_d[k] in the data structure.
 
-      //-------- search for the digest Colour_d[k] in the data structure.
-
-      //-------- if found, call transverse the chain starting from the head to find the pre-image.
-    }
+    //-------- if found, call transverse the chain starting from the head to find the pre-image.
   }
   return (0);
 }

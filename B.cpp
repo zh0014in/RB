@@ -60,14 +60,12 @@ int Reduce(unsigned int d[5], unsigned char m[3], int i)
   return (0);
 }
 
-int digestExists(unsigned int d[5])
+int destWordExists(unsigned char d[3], int n_chain)
 {
-  for (int i = 0; i < HT; i++)
+  for (int i = 0; i < n_chain; i++)
   {
     pD = D[i];
-    if (pD == nullptr)
-      break;
-    if (*pD == d[0] && *(pD + 1) == d[1] && *(pD + 2) == d[2] && *(pD + 3) == d[3] && *(pD + 4) == d[4])
+    if (*pD == d[0] && *(pD + 1) == d[1] && *(pD + 2) == d[2])
     {
       return 1;
     }
@@ -96,7 +94,7 @@ int buildT(int rounds)
       Hash(m, d);
       Reduce(d, m, j);
     }
-    if (digestExists(d) == 1)
+    if (destWordExists(m,N_CHAIN) == 1)
     {
       continue;
     }
