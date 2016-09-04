@@ -79,8 +79,8 @@ int ReadT()
   fseek(pFile, 0, SEEK_END);
   long lSize = ftell(pFile);
   rewind(pFile);
-
-  for (int i = 0; i < lSize / 6; i++)
+int N_CHAIN = lSize/6;
+  for (int i = 0; i < N_CHAIN; i++)
   {
     fread(&M[i], 3, 1, pFile);
     fread(&D[i], 3, 1, pFile);
@@ -88,7 +88,7 @@ int ReadT()
   }
 
   fclose(pFile);
-  return (0);
+  return N_CHAIN;
 }
 int destWordExists(unsigned char d[3], int n_chain)
 {
@@ -177,13 +177,13 @@ int main(int argc, char *argv[])
   int found;
   int total_found;
   int total_not_found;
-
+int chain_length;
   SHA1 sha;
   unsigned int d[5];  // 32 x 5 = 160 bits
   unsigned char m[3]; // 24 x 3
 
   //------------ R E A D     R A I N B O W    T A B L E  --------//
-  ReadT();
+  chain_length = ReadT();
   cout << "READ RAINBOW DONE" << endl;
 
   //--------  PROJECT  INPUT/OUTPUT FORMAT ----------------//

@@ -10,9 +10,9 @@ This program build the rainbow table  for the other program F.cpp.
 using namespace std;
 
 //  A table to store all the words and digests.
-//    infeasible to have such large table in practice.
+//    infeasible to have such large table in practice.ı
 //    for programming convenient, we store the whole table in memory.
-#define HT 10000 // 1048576
+#define HT 1048576
 unsigned char Word[HT][3];
 unsigned char M[HT][3];
 unsigned char D[HT][3];

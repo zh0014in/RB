@@ -4,6 +4,6 @@
     "version": "0.1.0",
     "command": "g++",
     "isShellCommand": true,
-    "args": ["F.cpp","sha1.cpp"],
+    "args": ["B.cpp","sha1.cpp"],
     "showOutput": "always"
 }
