@@ -140,11 +140,16 @@ for(int round = L_CHAIN - 1; round >= 0; round--){
         Hash(Colour_m, Colour_d);
         Reduce(Colour_d, Colour_m, i);
       }
+      Hash(Colour_m, Colour_d);
+      if(Colour_d[0] == target_d[0] && Colour_d[1] == target_d[1]
+      && Colour_d[2] == target_d[2] && Colour_d[3] == target_d[3]
+      && Colour_d[4] == target_d[4]){
       // Colour_m is now the pre-image
       answer_m[0] = Colour_m[0];
       answer_m[1] = Colour_m[1];
       answer_m[2] = Colour_m[2];
       return 1;
+      }
     }
 }
   return (0);
