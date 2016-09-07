@@ -11,7 +11,6 @@
 #include "sha1.h"
 
 using namespace std;
-#define MAX_LEN 100
 #define L_CHAIN 5
 unsigned long TOTAL_SHA = 0; // Count the number of hashes performed.
 
@@ -107,34 +106,23 @@ int destWordExists(unsigned char d[3], int n_chain)
 //------------------------------------------------------------------------------------
 //      Given a digest,  search for the pre-image   answer_m[3].
 //------------------------------------------------------------------------------------
-int search(unsigned int target_d[5], unsigned char answer_m[3])
+int search(unsigned int target_d[5], unsigned char answer_m[3], int n_chain)
 {
   int j, i;
-  //unsigned char Colour_m[MAX_LEN][3];
-  //unsigned int Colour_d[MAX_LEN][5];
   unsigned char Colour_m[3];
   unsigned int Colour_d[5];
-  unsigned int flag[MAX_LEN];
   Colour_d[0] = target_d[0];
   Colour_d[1] = target_d[1];
   Colour_d[2] = target_d[2];
   Colour_d[3] = target_d[3];
   Colour_d[4] = target_d[4];
   //cout << Colour_d[0] << Colour_d[1] << Colour_d[2] << endl;
-  // for (j = 0; j < L_CHAIN; j++)
-  // {
-  //   Colour_d[j][0] = target_d[0];
-  //   Colour_d[j][1] = target_d[1];
-  //   Colour_d[j][2] = target_d[2];
-  //   Colour_d[j][3] = target_d[3];
-  //   Colour_d[j][4] = target_d[4];
-  // }
 
   for (j = L_CHAIN - 1; j >= 0; j--)
   {
     Reduce(Colour_d, Colour_m, j);
     // check if Colour_m is in the data structure;
-    if (int index = destWordExists(Colour_m, MAX_LEN) >= 0)
+    if (int index = destWordExists(Colour_m, n_chain) >= 0)
     {
       cout << "word found" << endl;
       Colour_m[0] = M[index][0];
@@ -219,7 +207,7 @@ int chain_length;
     } while (iss);
     //cout << d[0] << d[1] << d[2] << d[3] << d[4] << endl;
     //readnextd(d);
-    if (search(d, m) > 0)
+    if (search(d, m, chain_length) > 0)
     {
       total_found++;
       //------   print the word in hexdecimal format   -----------
@@ -233,7 +221,7 @@ int chain_length;
     else
     {
       total_not_found++;
-      //cout << setw(6) << 0 << endl;
+      cout << setw(6) << 0 << endl;
     }
   }
   myFile.close();
