@@ -97,6 +97,7 @@ int buildT(int rounds)
     }
     if (destWordExists(m,N_CHAIN) >= 0)
     {
+      //cout << "word exists " << m[0] << ", " << m[1] << ", " << m[2] << endl;
       continue;
     }
     // copy destination word to D

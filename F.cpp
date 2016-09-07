@@ -83,12 +83,13 @@ int N_CHAIN = lSize/6;
   {
     fread(&M[i], 3, 1, pFile);
     fread(&D[i], 3, 1, pFile);
-    //cout << hex(M[i][0]) << (int)M[i][1] << (int)M[i][2] << "  " << (int)D[i][0] << (int)D[i][1] << (int)D[i][2] << endl;
+    //cout << hex(M[i][0]) << (int)M[i][1] << (int)M[i][2] << " >> " << (int)D[i][0] << (int)D[i][1] << (int)D[i][2] << endl;
   }
 
   fclose(pFile);
   return N_CHAIN;
 }
+
 int destWordExists(unsigned char d[3], int n_chain)
 {
   unsigned char *pD;
@@ -111,24 +112,30 @@ int search(unsigned int target_d[5], unsigned char answer_m[3], int n_chain)
   int j, i;
   unsigned char Colour_m[3];
   unsigned int Colour_d[5];
+  
+  //cout << Colour_d[0] << Colour_d[1] << Colour_d[2] << endl;
+
+for(int round = L_CHAIN - 1; round >= 0; round--){
   Colour_d[0] = target_d[0];
   Colour_d[1] = target_d[1];
   Colour_d[2] = target_d[2];
   Colour_d[3] = target_d[3];
   Colour_d[4] = target_d[4];
-  //cout << Colour_d[0] << Colour_d[1] << Colour_d[2] << endl;
-
-  for (j = L_CHAIN - 1; j >= 0; j--)
-  {
-    Reduce(Colour_d, Colour_m, j);
-    // check if Colour_m is in the data structure;
+  for(i = round; i < L_CHAIN-1; i++){
+    Reduce(Colour_d, Colour_m, i);
+    Hash(Colour_m, Colour_d);
+    cout << "reduce " << i << " hash "; 
+  }
+  Reduce(Colour_d, Colour_m, i);
+  cout << "reduce " << i << endl;
+  // check if Colour_m is in the data structure;
     if (int index = destWordExists(Colour_m, n_chain) >= 0)
     {
       cout << "word found" << endl;
       Colour_m[0] = M[index][0];
       Colour_m[1] = M[index][1];
       Colour_m[2] = M[index][2];
-      for (i = 0; i < j; i++)
+      for (i = 0; i < round; i++)
       {
         Hash(Colour_m, Colour_d);
         Reduce(Colour_d, Colour_m, i);
@@ -139,12 +146,7 @@ int search(unsigned int target_d[5], unsigned char answer_m[3], int n_chain)
       answer_m[2] = Colour_m[2];
       return 1;
     }
-    Hash(Colour_m, Colour_d);
-
-    //-------- search for the digest Colour_d[k] in the data structure.
-
-    //-------- if found, call transverse the chain starting from the head to find the pre-image.
-  }
+}
   return (0);
 }
 
@@ -172,7 +174,7 @@ int chain_length;
 
   //------------ R E A D     R A I N B O W    T A B L E  --------//
   chain_length = ReadT();
-  cout << "READ RAINBOW DONE" << endl;
+  cout << "READ RAINBOW DONE " << chain_length<< endl;
 
   //--------  PROJECT  INPUT/OUTPUT FORMAT ----------------//
 
@@ -211,6 +213,12 @@ int chain_length;
     {
       total_found++;
       //------   print the word in hexdecimal format   -----------
+      cout << setw(1) << d[0];
+      cout << setw(1) << d[1];
+      cout << setw(1) << d[2];
+      cout << setw(1) << d[3];
+      cout << setw(1) << d[4] << " << ";
+
       cout << setw(1) << (unsigned int)m[0] / 16;
       cout << setw(1) << (unsigned int)m[0] % 8;
       cout << setw(1) << (unsigned int)m[1] / 16;
@@ -221,7 +229,7 @@ int chain_length;
     else
     {
       total_not_found++;
-      cout << setw(6) << 0 << endl;
+      //cout << setw(6) << 0 << endl;
     }
   }
   myFile.close();
