@@ -53,9 +53,9 @@ int Hash(unsigned char m[3], unsigned int d[5])
 //-------  Reduce
 int Reduce(unsigned int d[5], unsigned char m[3], int i)
 {
-  m[0] = (d[(i + 0) % 5] >> (i % 5)) & 0xff;
-  m[1] = (d[(i + 1) % 5] >> (i % 5)) & 0xff;
-  m[2] = (d[(i + 2) % 5] >> (i % 5)) & 0xff;
+  m[0] = (d[(i + 0) % 5] >> ((i%5) * 8)) & 0xff;
+  m[1] = (d[(i + 1) % 5] >> ((i%5) * 8)) & 0xff;
+  m[2] = (d[(i + 2) % 5] >> ((i%5) * 8)) & 0xff;
 
   return (0);
 }

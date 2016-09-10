@@ -11,7 +11,6 @@
 #include "sha1.h"
 
 using namespace std;
-#define L_CHAIN 5
 unsigned long TOTAL_SHA = 0; // Count the number of hashes performed.
 
 unsigned char M[1024 * 512][3]; // array to store the word read from the table (head of chain)
@@ -42,10 +41,9 @@ int Hash(unsigned char m[3], unsigned int d[5])
 //---------------------------------------------------//
 int Reduce(unsigned int d[5], unsigned char m[3], int i)
 {
- m[0] = (d[(i + 0) % 5] >> (i % 5)) & 0xff;
-  m[1] = (d[(i + 1) % 5] >> (i % 5)) & 0xff;
-  m[2] = (d[(i + 2) % 5] >> (i % 5)) & 0xff;
-
+ m[0] = (d[(i + 0) % 5] >> ((i%5) * 8)) & 0xff;
+  m[1] = (d[(i + 1) % 5] >> ((i%5) * 8)) & 0xff;
+  m[2] = (d[(i + 2) % 5] >> ((i%5) * 8)) & 0xff;
   return (0);
 }
 
@@ -107,7 +105,7 @@ int destWordExists(unsigned char d[3], int n_chain)
 //------------------------------------------------------------------------------------
 //      Given a digest,  search for the pre-image   answer_m[3].
 //------------------------------------------------------------------------------------
-int search(unsigned int target_d[5], unsigned char answer_m[3], int n_chain)
+int search(unsigned int target_d[5], unsigned char answer_m[3], int n_chain, int rounds)
 {
   int j, i;
   unsigned char Colour_m[3];
@@ -115,13 +113,13 @@ int search(unsigned int target_d[5], unsigned char answer_m[3], int n_chain)
   
   //cout << Colour_d[0] << Colour_d[1] << Colour_d[2] << endl;
 
-for(int round = L_CHAIN - 1; round >= 0; round--){
+for(int round = rounds - 1; round >= 0; round--){
   Colour_d[0] = target_d[0];
   Colour_d[1] = target_d[1];
   Colour_d[2] = target_d[2];
   Colour_d[3] = target_d[3];
   Colour_d[4] = target_d[4];
-  for(i = round; i < L_CHAIN-1; i++){
+  for(i = round; i < rounds-1; i++){
     Reduce(Colour_d, Colour_m, i);
     Hash(Colour_m, Colour_d);
     //cout << "reduce " << i << " hash "; 
@@ -177,6 +175,8 @@ int chain_length;
   unsigned int d[5];  // 32 x 5 = 160 bits
   unsigned char m[3]; // 24 x 3
 
+  int rounds = atoi(argv[1]);
+
   //------------ R E A D     R A I N B O W    T A B L E  --------//
   chain_length = ReadT();
   cout << "READ RAINBOW DONE " << chain_length<< endl;
@@ -214,7 +214,7 @@ int chain_length;
     } while (iss);
     //cout << d[0] << d[1] << d[2] << d[3] << d[4] << endl;
     //readnextd(d);
-    if (search(d, m, chain_length) > 0)
+    if (search(d, m, chain_length, rounds) > 0)
     {
       total_found++;
       //------   print the word in hexdecimal format   -----------
