@@ -22,6 +22,22 @@ unsigned char *pD;
 unordered_map<unsigned long, unsigned int> HashTable;
 unordered_map<unsigned long, unsigned int>::const_iterator G;
 
+void printDigest(unsigned int d[5])
+{
+  for(int i = 0; i< 5; i++){
+  cout << hex << d[i] << " ";
+  }
+  cout << endl;
+}
+
+void printWord(unsigned char m[3])
+{
+  for(int i = 0; i < 3; i++){
+  cout << hex << m[i] << " ";
+  }
+  cout << endl;
+}
+
 //----  return the next word to be considered
 void next_word(unsigned char m[3])
 {
@@ -60,18 +76,40 @@ int Reduce(unsigned int d[5], unsigned char m[3], int i)
   return (0);
 }
 
-int destWordExists(unsigned char d[3], int n_chain)
+int destWordExists(unsigned char m[3], int n_chain)
 {
   unsigned char *pD;
   for (int i = 0; i < n_chain; i++)
   {
     pD = D[i];
-    if (*pD == d[0] && *(pD + 1) == d[1] && *(pD + 2) == d[2])
+    if (*pD == m[0] && *(pD + 1) == m[1] && *(pD + 2) == m[2])
     {
       return i;
     }
   }
   return -1;
+}
+
+void writeToFile(int rounds, int N_CHAIN)
+{
+
+  //---    Write to the output file
+  //note that to reduce the size of the table, it is not neccessary to write the full digest.
+  cout << "writing to file." << endl;
+  std::stringstream sstm;
+  sstm << "table_" << rounds << ".data";
+  const char *fileName = sstm.str().c_str();
+  FILE *pFile = fopen("table.data", "wb");
+  for (long i = 0; i < N_CHAIN; i++)
+  {
+    fwrite(&(M[i][2]), sizeof(unsigned char), 1, pFile);
+    fwrite(&(M[i][1]), sizeof(unsigned char), 1, pFile);
+    fwrite(&(M[i][0]), sizeof(unsigned char), 1, pFile);
+
+    fwrite(&(D[i][2]), sizeof(unsigned char), 1, pFile);
+    fwrite(&(D[i][1]), sizeof(unsigned char), 1, pFile);
+    fwrite(&(D[i][0]), sizeof(unsigned char), 1, pFile);
+  }
 }
 
 int buildT(int rounds)
@@ -95,7 +133,7 @@ int buildT(int rounds)
       Hash(m, d);
       Reduce(d, m, j);
     }
-    if (destWordExists(m,N_CHAIN) >= 0)
+    if (destWordExists(m, N_CHAIN) >= 0)
     {
       //cout << "word exists " << m[0] << ", " << m[1] << ", " << m[2] << endl;
       next_word(m);
@@ -106,26 +144,10 @@ int buildT(int rounds)
     D[N_CHAIN][1] = m[1];
     D[N_CHAIN][2] = m[2];
     N_CHAIN++;
-    cout << "built " << N_CHAIN << " records." << endl;
+    cout << "built " <<dec<< N_CHAIN << " records." << endl;
+    //printWord(m);
   }
-
-  //---    Write to the output file
-  //note that to reduce the size of the table, it is not neccessary to write the full digest.
-  cout << "writing to file." << endl;
-  std::stringstream sstm;
-  sstm << "table_" << rounds << ".data";
-  const char *fileName = sstm.str().c_str();
-  FILE *pFile = fopen("table.data", "wb");
-  for (long i = 0; i < N_CHAIN; i++)
-  {
-    fwrite(&(M[i][2]), sizeof(unsigned char), 1, pFile);
-    fwrite(&(M[i][1]), sizeof(unsigned char), 1, pFile);
-    fwrite(&(M[i][0]), sizeof(unsigned char), 1, pFile);
-
-    fwrite(&(D[i][2]), sizeof(unsigned char), 1, pFile);
-    fwrite(&(D[i][1]), sizeof(unsigned char), 1, pFile);
-    fwrite(&(D[i][0]), sizeof(unsigned char), 1, pFile);
-  }
+  //writeToFile(rounds, N_CHAIN);
   return (0);
 }
 
