@@ -13,27 +13,31 @@ using namespace std;
 //    infeasible to have such large table in practice.ı
 //    for programming convenient, we store the whole table in memory.
 #define HT 1048576
+#define RLength 16000
 unsigned char Word[HT][3];
 unsigned char M[HT][3];
 unsigned char D[HT][3];
 unsigned char *pM;
 unsigned char *pD;
+unsigned char R[RLength][3];
 
 unordered_map<unsigned long, unsigned int> HashTable;
 unordered_map<unsigned long, unsigned int>::const_iterator G;
 
 void printDigest(unsigned int d[5])
 {
-  for(int i = 0; i< 5; i++){
-  cout << hex << d[i] << " ";
+  for (int i = 0; i < 5; i++)
+  {
+    cout << hex << d[i] << " ";
   }
   cout << endl;
 }
 
 void printWord(unsigned char m[3])
 {
-  for(int i = 0; i < 3; i++){
-  cout << hex << m[i] << " ";
+  for (int i = 0; i < 3; i++)
+  {
+    cout << hex << m[i] << " ";
   }
   cout << endl;
 }
@@ -69,11 +73,20 @@ int Hash(unsigned char m[3], unsigned int d[5])
 //-------  Reduce
 int Reduce(unsigned int d[5], unsigned char m[3], int i)
 {
-  m[0] = (unsigned char)((d[0] + i) % 256); //8 bits
-  m[1] = (unsigned char)((d[1]) % 256);     //8 bits
-  m[2] = (unsigned char)((d[2]) % 256);     //8 bits
+  m[0] = (unsigned char)((d[(0+i)%5] + i) % 256); //8 bits
+  m[1] = (unsigned char)((d[(1+i)%5]) % 256);     //8 bits
+  m[2] = (unsigned char)((d[(2+i)%5]) % 256);     //8 bits
 
   return (0);
+}
+
+int meetInitialValue(unsigned char iv[3], unsigned char m[3])
+{
+  if (iv[0] == m[0] && iv[1] == m[1] && iv[2] == m[2])
+  {
+    return 1;
+  }
+  return -1;
 }
 
 int destWordExists(unsigned char m[3], int n_chain)
@@ -117,6 +130,9 @@ int buildT(int rounds)
   unsigned int d[5];
   unsigned char m[3];
   int N_CHAIN = 0;
+  m[0] = Word[0][0];
+  m[1] = Word[0][1];
+  m[2] = Word[0][2];
   for (int i = 0; i < HT; i++)
   {
     //next_word(m);
@@ -133,18 +149,24 @@ int buildT(int rounds)
       Hash(m, d);
       Reduce(d, m, j);
     }
-    if (destWordExists(m, N_CHAIN) >= 0)
-    {
-      //cout << "word exists " << m[0] << ", " << m[1] << ", " << m[2] << endl;
-      next_word(m);
-      continue;
-    }
+
     // copy destination word to D
     D[N_CHAIN][0] = m[0];
     D[N_CHAIN][1] = m[1];
     D[N_CHAIN][2] = m[2];
     N_CHAIN++;
-    cout << "built " <<dec<< N_CHAIN << " records." << endl;
+    cout << "built " << dec << N_CHAIN << " records." << endl;
+
+    if (meetInitialValue(M[N_CHAIN], m) > 0)
+    {
+      do
+      {
+        next_word(m);
+        cout << "word exists "; // << m[0] << ", " << m[1] << ", " << m[2] << endl;
+        printWord(m);
+      } while (destWordExists(m, N_CHAIN) >= 0);
+      continue;
+    }
     //printWord(m);
   }
   //writeToFile(rounds, N_CHAIN);

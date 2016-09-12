@@ -41,9 +41,9 @@ int Hash(unsigned char m[3], unsigned int d[5])
 //---------------------------------------------------//
 int Reduce(unsigned int d[5], unsigned char m[3], int i)
 {
- m[0] = (unsigned char)((d[0] + i) % 256); //8 bits
-  m[1] = (unsigned char)((d[1]) % 256);     //8 bits
-  m[2] = (unsigned char)((d[2]) % 256);     //8 bits
+ m[0] = (unsigned char)((d[(0+i)%5]) % 256); //8 bits
+  m[1] = (unsigned char)((d[(1+i)%5]) % 256);     //8 bits
+  m[2] = (unsigned char)((d[(2+i)%5]) % 256);     //8 bits
   return (0);
 }
 
